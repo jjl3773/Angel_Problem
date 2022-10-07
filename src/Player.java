@@ -8,7 +8,7 @@ import java.awt.Image;
 // The base class for a player in this game. This class is
 // meant to be inherited by another class to provide specific
 // movement options for the player.
-public class Player {
+public abstract class Player {
     // in terms of grid squares
     int currX, currY;
     // Inheriting classes should define the valid squares this player is able
@@ -20,14 +20,14 @@ public class Player {
         this.squaresToMove = new HashSet<>();
     }
 
-    /*
+    /**
      * View frame should call this method when a move is inputted by the player
-     * @param 
+     * @param removed the set of squares that have been removed from the grid
      * @returns whether or not the player made a legal move. If the move was legal,
      * the player's position is adjusted accordingly.
      */
-    public boolean makeMove(Set<Point> deleted, Point pos) {
-        if (deleted.contains(pos)) {
+    public boolean makeMove(Set<Point> removed, Point pos) {
+        if (removed.contains(pos)) {
             return false;
         }
 

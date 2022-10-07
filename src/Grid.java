@@ -34,19 +34,27 @@ class GridsCanvas extends JPanel {
   int prevScreenX, prevScreenY;
 
   MouseInputListener listener;
-  // keep track of points in the form (x, y) where each
+
+  // the current move of the game
+  int move;
+
+  // keep track of "eaten squares" in the form (x, y) where each
   // point corresponds to the corner of some grid square
-  Set<Point> points;
+  Set<Point> removed;
 
   // The player of the game
   Player player;
 
+  // The Devil facing off against the player
+  Devil devil;
+
   GridsCanvas(int w, int h, int d) {
     setSize(width = w, height = h);
     dim = d;
-    points = new HashSet<>();
+    removed = new HashSet<>();
     listener = new CustomMouseListener();
     player = new King(1);
+    devil = new SimpleDevil();
 
     // enable frame to pick up mouse input
     addMouseListener(listener);
@@ -72,7 +80,7 @@ class GridsCanvas extends JPanel {
       g.drawLine(i * dim + currMouseX, 0, i * dim + currMouseX, height);
       i++;
     }
-
+    
     // draw player valid positions
     g.setColor(Color.GRAY);
     Point playerPos = player.playerPos();
@@ -81,9 +89,9 @@ class GridsCanvas extends JPanel {
     }
     g.drawImage(player.getImage(), playerPos.x * dim - screenX + 1 + dim/10, playerPos.y * dim - screenY + 1 + dim/10, (dim * 8/10) - 1, (dim * 8/10) - 1, getBackground(), null);
 
-    // loop through points and draw the ones that are visible in the current frame
+    // loop through removed and draw the ones that are visible in the current frame
     g.setColor(Color.RED);
-    for (Point point: points) {
+    for (Point point: removed) {
         int pointInCurrViewX = point.x * dim - screenX;
         int pointInCurrViewY = point.y * dim - screenY;
         if (0 - dim <= pointInCurrViewX && pointInCurrViewX < width && 0 - dim <= pointInCurrViewY && pointInCurrViewY < height) {
@@ -102,11 +110,14 @@ class GridsCanvas extends JPanel {
         Point point = e.getPoint();
 
         if (SwingUtilities.isRightMouseButton(e)) {
-            points.add(new Point(Math.floorDiv(point.x + screenX, dim), Math.floorDiv(point.y + screenY, dim)));
+            removed.add(new Point(Math.floorDiv(point.x + screenX, dim), Math.floorDiv(point.y + screenY, dim)));
         }        
         // use floordiv to account for rounding when negative, we always
         // want to round to the lower integer
-        player.makeMove(points, new Point(Math.floorDiv(point.x + screenX, dim), Math.floorDiv(point.y + screenY, dim)));
+        if (player.makeMove(removed, new Point(Math.floorDiv(point.x + screenX, dim), Math.floorDiv(point.y + screenY, dim)))) {
+            devil.eatSquare(move, removed, player.playerPos());
+        }
+        move++;
         repaint();
     }
 
