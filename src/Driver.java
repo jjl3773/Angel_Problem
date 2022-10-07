@@ -6,7 +6,7 @@ import javax.swing.JFrame;
  */
 public class Driver extends JFrame {
   public Driver() {
-    GridsCanvas xyz = new GridsCanvas(1000, 1000, 50);
+    GridsCanvas xyz = new GridsCanvas(1000, 1000, 15);
     add(xyz);
     pack();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
