@@ -5,15 +5,18 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputListener;
-// import javax.swing.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
+import javax.swing.event.MouseInputAdapter;
 import java.util.HashSet;
 import java.util.Set;
 import java.awt.Point;
 import java.lang.Math;
 
 class GridsCanvas extends JPanel {
-  // width and height in pixels (?)
+  public static final int maxZoom = 100;
+  public static final int minZoom = 10;
+
+  // width and height in pixels
   int width, height;
 
   // mouse coords on click
@@ -23,7 +26,8 @@ class GridsCanvas extends JPanel {
   int currMouseX, currMouseY;
 
   // previous mouse coords - stores how the view on the plane
-  // is currently shifted
+  // is currently shifted. Similar to screenX/Y but value is
+  // % by dimension.
   int prevMouseX, prevMouseY;
 
   // the dimension of each grid
@@ -33,7 +37,7 @@ class GridsCanvas extends JPanel {
   int screenX, screenY;
   int prevScreenX, prevScreenY;
 
-  MouseInputListener listener;
+  MouseInputAdapter listener;
   // keep track of points in the form (x, y) where each
   // point corresponds to the corner of some grid square
   Set<Point> points;
@@ -51,7 +55,9 @@ class GridsCanvas extends JPanel {
     // enable frame to pick up mouse input
     addMouseListener(listener);
     addMouseMotionListener(listener);
-    // addMouseWheelListener();
+
+    // work on later
+    // addMouseWheelListener(listener);
   }
 
   @Override
@@ -93,7 +99,7 @@ class GridsCanvas extends JPanel {
     g.setColor(Color.BLACK);
   }
 
-  class CustomMouseListener implements MouseInputListener {
+  class CustomMouseListener extends MouseInputAdapter {
     public CustomMouseListener() {
     }
 
@@ -155,6 +161,16 @@ class GridsCanvas extends JPanel {
     public void mousePressed(MouseEvent e) {
         orgMouseX = e.getX();
         orgMouseY = e.getY();
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int rotations = e.getWheelRotation();
+        dim -= rotations;
+        dim = Math.max(dim, minZoom);
+        dim = Math.min(dim, maxZoom);
+
+        repaint();
     }
   }
 }

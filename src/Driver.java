@@ -1,6 +1,9 @@
 package src;
 import javax.swing.JFrame;
 
+/*
+ * The Driver code for the game which contains the main method
+ */
 public class Driver extends JFrame {
   public Driver() {
     GridsCanvas xyz = new GridsCanvas(1000, 1000, 50);
